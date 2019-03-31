@@ -15,8 +15,8 @@ def group_norm(inputs, groups):
     return tf.contrib.layers.group_norm(
         inputs=inputs,
         groups=groups,
-        channels_axis=-3,
-        reduction_axes=[-2, -1],
+        channels_axis=1,
+        reduction_axes=[2, 3],
         center=True,
         scale=True
     )
