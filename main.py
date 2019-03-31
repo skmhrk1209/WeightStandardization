@@ -28,7 +28,7 @@ if __name__ == "__main__":
     estimator = tf.estimator.Estimator(
         model_fn=Classifier(
             network=ResNet(
-                conv_param=Param(filters=16, kernel_size=[3, 3], strides=[1, 1]),
+                conv_param=Param(filters=32, kernel_size=[3, 3], strides=[1, 1]),
                 pool_param=None,
                 residual_params=[
                     Param(filters=32, strides=[1, 1], blocks=3),
