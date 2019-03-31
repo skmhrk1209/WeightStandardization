@@ -42,9 +42,9 @@ if __name__ == "__main__":
             ),
             params=Param(
                 weight_decay=2e-4,
-                learning_rate=tf.train.exponential_decay(
+                learning_rate_fn=lambda global_step: tf.train.exponential_decay(
                     learning_rate=0.1,
-                    global_step=tf.train.get_or_create_global_step(),
+                    global_step=global_step,
                     decay_steps=2500000,
                     decay_rate=0.1
                 ),

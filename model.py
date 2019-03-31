@@ -23,14 +23,15 @@ class Classifier(object):
 
         if mode == tf.estimator.ModeKeys.TRAIN:
             with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
+                global_step = tf.train.get_or_create_global_step()
                 optimizer = tf.train.MomentumOptimizer(
-                    learning_rate=self.params.learning_rate,
+                    learning_rate=self.params.learning_rate_fn(global_step),
                     momentum=self.params.momentum,
                     use_nesterov=True
                 )
                 train_op = optimizer.minimize(
                     loss=loss,
-                    global_step=tf.train.get_or_create_global_step()
+                    global_step=global_step
                 )
             return tf.estimator.EstimatorSpec(
                 mode=mode,
