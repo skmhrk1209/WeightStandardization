@@ -40,7 +40,7 @@ if __name__ == "__main__":
                 num_classes=10,
                 apply_weight_standardization=True
             ),
-            params=dict(
+            params=Param(
                 weight_decay=2e-4,
                 learning_rate=tf.train.exponential_decay(
                     learning_rate=0.1,

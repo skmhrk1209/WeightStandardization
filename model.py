@@ -9,7 +9,7 @@ class Classifier(object):
         self.network = network
         self.params = params
 
-    def __call__(self, features, labels, mode, params):
+    def __call__(self, features, labels, mode):
 
         logits = self.network(
             inputs=features,
