@@ -43,7 +43,7 @@ if __name__ == "__main__":
             params=Param(
                 weight_decay=2e-4,
                 learning_rate_fn=lambda global_step: tf.train.piecewise_constant(
-                    global_step=global_step,
+                    x=global_step,
                     boundaries=[50000 * num_epochs // args.batch_size for num_epochs in [100, 150, 200]],
                     values=[0.1 * decay_rate for decay_rate in [1.0, 0.1, 0.01, 0.001]]
                 ),
