@@ -28,7 +28,7 @@ tf.logging.set_verbosity(tf.logging.INFO)
 if __name__ == "__main__":
 
     estimator = tf.estimator.Estimator(
-        model_fn=lambda features, labels, mode, params: Classifier(
+        model_fn=Classifier(
             network=ResNet(
                 conv_param=Param(filters=16, kernel_size=[3, 3], strides=[1, 1]),
                 pool_param=None,
@@ -39,17 +39,17 @@ if __name__ == "__main__":
                 ],
                 num_classes=10,
                 apply_weight_standardization=True
-            )
-        )(features, labels, mode, Param(params)),
-        params=dict(
-            weight_decay=2e-4,
-            learning_rate=tf.train.exponential_decay(
-                learning_rate=0.1,
-                global_step=tf.train.get_or_create_global_step(),
-                decay_steps=2500000,
-                decay_rate=0.1
             ),
-            momentum=0.9
+            params=dict(
+                weight_decay=2e-4,
+                learning_rate=tf.train.exponential_decay(
+                    learning_rate=0.1,
+                    global_step=tf.train.get_or_create_global_step(),
+                    decay_steps=2500000,
+                    decay_rate=0.1
+                ),
+                momentum=0.9
+            )
         ),
         model_dir=args.model_dir,
         config=tf.estimator.RunConfig(

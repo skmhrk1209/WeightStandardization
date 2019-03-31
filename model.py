@@ -4,27 +4,28 @@ import numpy as np
 
 class Classifier(object):
 
-    def __init__(self, network):
+    def __init__(self, network, params):
 
         self.network = network
+        self.params = params
 
-    def __call__(self, images, labels, mode, params):
+    def __call__(self, features, labels, mode, params):
 
         logits = self.network(
-            inputs=images,
+            inputs=features,
             training=mode == tf.estimator.ModeKeys.TRAIN
         )
         loss = tf.losses.sparse_softmax_cross_entropy(
             labels=labels,
             logits=logits
         )
-        loss += tf.add_n(list(map(tf.nn.l2_loss, tf.trainable_variables()))) * param.weight_decay
+        loss += tf.add_n(list(map(tf.nn.l2_loss, tf.trainable_variables()))) * self.params.weight_decay
 
         if mode == tf.estimator.ModeKeys.TRAIN:
             with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
                 optimizer = tf.train.MomentumOptimizer(
-                    learning_rate=params.learning_rate,
-                    momentum=params.momentum,
+                    learning_rate=self.params.learning_rate,
+                    momentum=self.params.momentum,
                     use_nesterov=True
                 )
                 train_op = optimizer.minimize(
