@@ -30,22 +30,26 @@ if __name__ == "__main__":
     estimator = tf.estimator.Estimator(
         model_fn=lambda features, labels, mode, params: Classifier(
             network=ResNet(
-                conv_param=Param(filters=64, kernel_size=[7, 7], strides=[2, 2]),
-                pool_param=Param(kernel_size=[3, 3], strides=[2, 2]),
+                conv_param=Param(filters=16, kernel_size=[3, 3], strides=[1, 1]),
+                pool_param=None,
                 residual_params=[
-                    Param(filters=64, strides=[2, 2], blocks=2),
-                    Param(filters=128, strides=[2, 2], blocks=2),
-                    Param(filters=256, strides=[2, 2], blocks=2),
-                    Param(filters=512, strides=[2, 2], blocks=2),
+                    Param(filters=16, strides=[1, 1], blocks=3),
+                    Param(filters=32, strides=[2, 2], blocks=3),
+                    Param(filters=64, strides=[2, 2], blocks=3),
                 ],
                 num_classes=10,
                 apply_weight_standardization=True
             )
         )(features, labels, mode, Param(params)),
         params=dict(
-            learning_rate=0.001,
-            beta1=0.9,
-            beta2=0.999,
+            weight_decay=2e-4,
+            learning_rate=tf.train.exponential_decay(
+                learning_rate=0.1,
+                global_step=tf.train.get_or_create_global_step(),
+                decay_steps=2500000,
+                decay_rate=0.1
+            ),
+            momentum=0.9
         ),
         model_dir=args.model_dir,
         config=tf.estimator.RunConfig(
@@ -64,6 +68,7 @@ if __name__ == "__main__":
                 num_epochs=args.num_epochs if args.train else 1,
                 shuffle=True if args.train else False,
             ),
+            steps=args.steps,
             max_steps=args.max_steps,
             hooks=[
                 hooks.ValidationMonitorHook(
@@ -76,7 +81,7 @@ if __name__ == "__main__":
                         shuffle=False,
                     ),
                     every_n_steps=1000,
-                    steps=1000,
+                    steps=100,
                     name="validation"
                 )
             ]

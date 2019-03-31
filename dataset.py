@@ -8,14 +8,14 @@ def cifar10_input_fn(filenames, batch_size, num_epochs, shuffle):
 
     def unpickle(file):
         with open(file, "rb") as file:
-            dict = pickle.load(file, encoding="bytes")
-        return dict
+            return pickle.load(file, encoding="bytes")
 
     def preprocess(images, labels):
 
         images = tf.reshape(images, [-1, 3, 32, 32])
         images = tf.image.convert_image_dtype(images, tf.float32)
         images = tf.image.random_flip_left_right(images)
+        images = tf.image.per_image_standardization(images)
 
         return images, labels
 

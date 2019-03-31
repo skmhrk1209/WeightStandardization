@@ -18,13 +18,17 @@ class Classifier(object):
             labels=labels,
             logits=logits
         )
+        loss += tf.add_n([
+            tf.nn.l2_loss(variable)
+            for variable in tf.trainable_variables()
+        ]) * param.weight_decay
 
         if mode == tf.estimator.ModeKeys.TRAIN:
             with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-                optimizer = tf.train.AdamOptimizer(
+                optimizer = tf.train.MomentumOptimizer(
                     learning_rate=params.learning_rate,
-                    beta1=params.beta1,
-                    beta2=params.beta2
+                    momentum=params.momentum,
+                    use_nesterov=True
                 )
                 train_op = optimizer.minimize(
                     loss=loss,
