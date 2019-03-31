@@ -19,7 +19,10 @@ class Classifier(object):
             labels=labels,
             logits=logits
         )
-        loss += tf.add_n(list(map(tf.nn.l2_loss, tf.trainable_variables()))) * self.params.weight_decay
+        loss += tf.add_n([
+            tf.nn.l2_loss(variable)
+            for variable in tf.trainable_variables()
+        ]) * self.params.weight_decay
 
         if mode == tf.estimator.ModeKeys.TRAIN:
             with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
