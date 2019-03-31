@@ -13,9 +13,11 @@ def cifar10_input_fn(filenames, batch_size, num_epochs, shuffle):
     def preprocess(images, labels):
 
         images = tf.reshape(images, [-1, 3, 32, 32])
+        images = tf.transpose(images, [0, 2, 3, 1])
         images = tf.image.convert_image_dtype(images, tf.float32)
         images = tf.image.random_flip_left_right(images)
         images = tf.image.per_image_standardization(images)
+        images = tf.transpose(images, [0, 3, 1, 2])
 
         return images, labels
 
