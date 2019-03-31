@@ -15,7 +15,7 @@ parser.add_argument('--train_filenames', type=str, default="cifar-10-batches-py/
 parser.add_argument('--valid_filenames', type=str, default="cifar-10-batches-py/test_batch*")
 parser.add_argument('--test_filenames', type=str, default="cifar-10-batches-py/test_batch*")
 parser.add_argument("--batch_size", type=int, default=64)
-parser.add_argument("--num_epochs", type=int, default=100)
+parser.add_argument("--num_epochs", type=int, default=200)
 parser.add_argument("--max_steps", type=int, default=None)
 parser.add_argument("--steps", type=int, default=None)
 parser.add_argument('--train', action="store_true")
@@ -38,7 +38,7 @@ if __name__ == "__main__":
                     Param(filters=64, strides=[2, 2], blocks=3),
                 ],
                 num_classes=10,
-                apply_weight_standardization=False
+                apply_weight_standardization=True
             ),
             params=Param(
                 weight_decay=2e-4,
