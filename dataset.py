@@ -8,7 +8,8 @@ def cifar10_input_fn(filenames, batch_size, num_epochs, shuffle):
 
     def unpickle(file):
         with open(file, "rb") as file:
-            return pickle.load(file, encoding="bytes")
+            dict = pickle.load(file, encoding="bytes")
+        return dict
 
     def preprocess(images, labels):
 
