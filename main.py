@@ -11,9 +11,7 @@ from network import ResNet
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_dir", type=str, default="cifar10_resnet_model")
-parser.add_argument('--train_filenames', type=str, default="cifar-10-batches-py/data_batch*")
-parser.add_argument('--valid_filenames', type=str, default="cifar-10-batches-py/test_batch*")
-parser.add_argument('--test_filenames', type=str, default="cifar-10-batches-py/test_batch*")
+parser.add_argument('--filenames', type=str, default="cifar-10-batches-py/data_batch*")
 parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--num_epochs", type=int, default=200)
 parser.add_argument("--max_steps", type=int, default=None)
@@ -68,39 +66,20 @@ if __name__ == "__main__":
                 shuffle=True if args.train else False,
             ),
             steps=args.steps,
-            max_steps=args.max_steps,
-            hooks=[
-                hooks.ValidationMonitorHook(
-                    estimator=estimator,
-                    input_fn=functools.partial(
-                        cifar10_input_fn,
-                        filenames=glob.glob(args.valid_filenames),
-                        batch_size=args.batch_size,
-                        num_epochs=1,
-                        shuffle=False,
-                    ),
-                    every_n_steps=1000,
-                    steps=100,
-                    name="validation"
-                )
-            ]
+            max_steps=args.max_steps
         )
 
     if args.eval:
 
-        eval_result = estimator.evaluate(
+        print("==================================================")
+        tf.logging.info(estimator.evaluate(
             input_fn=functools.partial(
                 cifar10_input_fn,
-                filenames=glob.glob(args.test_filenames),
+                filenames=glob.glob(args.filenames),
                 batch_size=args.batch_size,
                 num_epochs=1,
                 shuffle=False,
             ),
-            steps=args.steps,
-            name="test"
-        )
-
-        print("==================================================")
-        tf.logging.info("test result")
-        tf.logging.info(eval_result)
+            steps=args.steps
+        ))
         print("==================================================")

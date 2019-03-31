@@ -48,7 +48,7 @@ class ResNet(object):
                             strides=residual_param.strides,
                             projection_shortcut=True,
                             normalization=(
-                                functools.partial(group_norm, groups=16)
+                                functools.partial(group_norm, groups=32)
                                 if self.apply_weight_standardization else
                                 functools.partial(batch_norm, training=training)
                             ),
@@ -63,7 +63,7 @@ class ResNet(object):
                             strides=[1, 1],
                             projection_shortcut=False,
                             normalization=(
-                                functools.partial(group_norm, groups=16)
+                                functools.partial(group_norm, groups=32)
                                 if self.apply_weight_standardization else
                                 functools.partial(batch_norm, training=training)
                             ),
@@ -72,7 +72,7 @@ class ResNet(object):
 
             with tf.variable_scope("norm"):
                 if self.apply_weight_standardization:
-                    inputs = group_norm(inputs, groups=16)
+                    inputs = group_norm(inputs, groups=32)
                 else:
                     inputs = batch_norm(inputs, training=training)
 
