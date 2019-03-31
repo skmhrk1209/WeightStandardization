@@ -60,7 +60,7 @@ if __name__ == "__main__":
         estimator.train(
             input_fn=functools.partial(
                 cifar10_input_fn,
-                filenames=glob.glob(args.train_filenames),
+                filenames=glob.glob(args.filenames),
                 batch_size=args.batch_size,
                 num_epochs=args.num_epochs if args.train else 1,
                 shuffle=True if args.train else False,
