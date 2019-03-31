@@ -20,7 +20,6 @@ parser.add_argument("--max_steps", type=int, default=None)
 parser.add_argument("--steps", type=int, default=None)
 parser.add_argument('--train', action="store_true")
 parser.add_argument('--eval', action="store_true")
-parser.add_argument("--gpu", type=str, default="0")
 args = parser.parse_args()
 
 tf.logging.set_verbosity(tf.logging.INFO)
@@ -51,13 +50,7 @@ if __name__ == "__main__":
         model_dir=args.model_dir,
         config=tf.estimator.RunConfig(
             save_summary_steps=100,
-            save_checkpoints_steps=1000,
-            session_config=tf.ConfigProto(
-                gpu_options=tf.GPUOptions(
-                    visible_device_list=args.gpu,
-                    allow_growth=True
-                )
-            )
+            save_checkpoints_steps=1000
         )
     )
 
