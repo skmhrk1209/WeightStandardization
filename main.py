@@ -31,9 +31,9 @@ if __name__ == "__main__":
                 conv_param=Param(filters=16, kernel_size=[3, 3], strides=[1, 1]),
                 pool_param=None,
                 residual_params=[
-                    Param(filters=16, strides=[1, 1], blocks=3),
-                    Param(filters=32, strides=[2, 2], blocks=3),
+                    Param(filters=32, strides=[1, 1], blocks=3),
                     Param(filters=64, strides=[2, 2], blocks=3),
+                    Param(filters=128, strides=[2, 2], blocks=3),
                 ],
                 num_classes=10,
                 apply_weight_standardization=True
