@@ -42,6 +42,4 @@ def cifar10_input_fn(filenames, batch_size, num_epochs, shuffle):
     )
     dataset = dataset.prefetch(buffer_size=1)
 
-    iterator = dataset.make_one_shot_iterator()
-
-    return iterator.get_next()
+    return dataset.make_one_shot_iterator()
