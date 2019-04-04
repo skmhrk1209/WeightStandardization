@@ -42,9 +42,11 @@ if __name__ == "__main__":
         shuffle=True if args.train else False,
     )
 
+    global_step = tf.train.create_global_step()
+
     optimizer = tf.train.MomentumOptimizer(
         learning_rate=tf.train.piecewise_constant(
-            x=tf.train.get_or_create_global_step(),
+            x=global_step,
             boundaries=[50000 * num_epochs // args.batch_size for num_epochs in [100, 150, 200]],
             values=[0.1 * decay_rate for decay_rate in [1.0, 0.1, 0.01, 0.001]]
         ),
@@ -81,7 +83,7 @@ if __name__ == "__main__":
 
     train_op = optimizer.apply_gradients(
         grads_and_vars=zip(gradients, variables),
-        global_step=tf.train.get_or_create_global_step()
+        global_step=global_step
     )
 
     with tf.train.SingularMonitoredSession(
@@ -111,7 +113,7 @@ if __name__ == "__main__":
             ),
             tf.train.LoggingTensorHook(
                 tensors=dict(
-                    global_step=tf.train.get_global_step(),
+                    global_step=global_step,
                     loss=loss
                 ),
                 every_n_iter=100,
