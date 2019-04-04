@@ -36,7 +36,7 @@ if __name__ == "__main__":
         num_classes=10,
     )
 
-    iterator = cifar10_input_fn(
+    images, labels = cifar10_input_fn(
         filenames=glob.glob(args.filenames),
         batch_size=args.batch_size,
         num_epochs=args.num_epochs if args.train else 1,
@@ -53,12 +53,13 @@ if __name__ == "__main__":
         use_nesterov=True
     )
 
+    images_list = tf.split(images, num_or_size_splits=args.batch_size, axis=0)
+    labels_list = tf.split(labels, num_or_size_splits=args.batch_size, axis=0)
+
     loss_list = []
     gradients_list = []
 
-    for i in range(args.batch_size):
-
-        images, labels = iterator.get_next()
+    for images, labels in zip(images_list, labels_list):
 
         logits = resnet(images, reuse=bool(i))
 
