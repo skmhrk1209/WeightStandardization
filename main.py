@@ -50,10 +50,8 @@ if __name__ == "__main__":
             logits=logits,
             reduction=tf.losses.Reduction.NONE
         )
-        losses += tf.add_n([
-            tf.nn.l2_loss(variable)
-            for variable in tf.trainable_variables()
-        ]) * 2e-4
+        losses += tf.add_n([tf.nn.l2_loss(variable) for variable in tf.trainable_variables()]) * 2e-4
+        loss = tf.reduce_mean(losses)
 
         global_step = tf.train.create_global_step()
         optimizer = tf.train.MomentumOptimizer(
@@ -68,12 +66,10 @@ if __name__ == "__main__":
 
         def generator():
             global variables
-            for losses in tf.split(losses, num_or_size_splits=args.batch_size, axis=0):
-                loss = tf.reduce_mean(losses)
+            for loss in tf.unstack(losses):
                 gradients, variables = zip(*optimizer.compute_gradients(loss))
                 yield gradients
 
-        loss = tf.reduce_mean(losses)
         gradients = map(functools.partial(tf.reduce_mean, axis=0), zip(*generator()))
 
         train_op = optimizer.apply_gradients(
