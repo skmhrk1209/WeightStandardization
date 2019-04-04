@@ -9,7 +9,10 @@ class Classifier(object):
 
     def __call__(self, images, labels, mode, params):
 
-        logits = self.network(images, training=mode == tf.estimator.ModeKeys.TRAIN)
+        logits = self.network(
+            inputs=images,
+            training=mode == tf.estimator.ModeKeys.TRAIN
+        )
 
         losses = tf.losses.sparse_softmax_cross_entropy(
             labels=labels,
