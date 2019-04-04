@@ -107,11 +107,11 @@ if __name__ == "__main__":
                     ])
                 ),
                 tf.train.LoggingTensorHook(
-                    tensors=dict(
-                        global_step=global_step,
-                        loss=loss
-                    ),
-                    every_n_iter=100,
+                    tensors={
+                        "global_step": global_step,
+                        "loss": loss
+                    },
+                    every_n_iter=100
                 )
             ]
         ) as session:
