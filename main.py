@@ -50,7 +50,10 @@ if __name__ == "__main__":
             logits=logits,
             reduction=tf.losses.Reduction.NONE
         )
-        losses += tf.add_n([tf.nn.l2_loss(variable) for variable in tf.trainable_variables()]) * 2e-4
+        losses += tf.add_n([
+            tf.nn.l2_loss(variable)
+            for variable in tf.trainable_variables()
+        ]) * 2e-4
 
         global_step = tf.train.create_global_step()
         optimizer = tf.train.MomentumOptimizer(
