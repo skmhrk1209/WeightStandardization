@@ -64,16 +64,15 @@ if __name__ == "__main__":
             use_nesterov=True
         )
 
-        def generator():
-            global variables
-            for loss in tf.unstack(losses, axis=0):
-                gradients, variables = zip(*optimizer.compute_gradients(loss))
-                yield gradients
-
-        gradients = map(functools.partial(tf.reduce_mean, axis=0), zip(*generator()))
+        gradients = [
+            tf.reduce_mean(gradients, axis=0) for gradient in zip(*[
+                zip(*optimizer.compute_gradients(loss))[0]
+                for loss in tf.unstack(losses, axis=0)
+            ])
+        ]
 
         train_op = optimizer.apply_gradients(
-            grads_and_vars=zip(gradients, variables),
+            grads_and_vars=zip(gradients, tf.trainable_variables()),
             global_step=global_step
         )
 
