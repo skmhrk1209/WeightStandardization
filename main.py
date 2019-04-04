@@ -51,8 +51,7 @@ if __name__ == "__main__":
                 values=[0.1 * decay_rate for decay_rate in [1.0, 0.1, 0.01, 0.001]]
             ),
             momentum=0.9,
-            use_nesterov=True,
-            iterations=args.batch_size
+            use_nesterov=True
         )
     )
 
