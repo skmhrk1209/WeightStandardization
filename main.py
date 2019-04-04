@@ -42,78 +42,80 @@ if __name__ == "__main__":
         shuffle=True if args.train else False,
     )
 
-    global_step = tf.train.create_global_step()
+    if args.train:
 
-    optimizer = tf.train.MomentumOptimizer(
-        learning_rate=tf.train.piecewise_constant(
-            x=global_step,
-            boundaries=[50000 * num_epochs // args.batch_size for num_epochs in [100, 150, 200]],
-            values=[0.1 * decay_rate for decay_rate in [1.0, 0.1, 0.01, 0.001]]
-        ),
-        momentum=0.9,
-        use_nesterov=True
-    )
+        global_step = tf.train.create_global_step()
 
-    images_list = tf.split(images, num_or_size_splits=args.batch_size, axis=0)
-    labels_list = tf.split(labels, num_or_size_splits=args.batch_size, axis=0)
+        optimizer = tf.train.MomentumOptimizer(
+            learning_rate=tf.train.piecewise_constant(
+                x=global_step,
+                boundaries=[50000 * num_epochs // args.batch_size for num_epochs in [100, 150, 200]],
+                values=[0.1 * decay_rate for decay_rate in [1.0, 0.1, 0.01, 0.001]]
+            ),
+            momentum=0.9,
+            use_nesterov=True
+        )
 
-    loss_list = []
-    gradients_list = []
+        images_list = tf.split(images, num_or_size_splits=args.batch_size, axis=0)
+        labels_list = tf.split(labels, num_or_size_splits=args.batch_size, axis=0)
 
-    for images, labels in zip(images_list, labels_list):
+        loss_list = []
+        gradients_list = []
 
-        logits = resnet(images, reuse=tf.AUTO_REUSE)
+        for images, labels in zip(images_list, labels_list):
 
-        loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
-        loss += tf.add_n([tf.nn.l2_loss(variable) for variable in tf.trainable_variables()]) * 2e-4
+            logits = resnet(images, reuse=tf.AUTO_REUSE)
 
-        gradients, variables = zip(*optimizer.compute_gradients(loss))
+            loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
+            loss += tf.add_n([tf.nn.l2_loss(variable) for variable in tf.trainable_variables()]) * 2e-4
 
-        loss_list.append(loss)
-        gradients_list.append(gradients)
+            gradients, variables = zip(*optimizer.compute_gradients(loss))
 
-    loss = tf.reduce_mean(loss_list, axis=0)
-    gradients = map(functools.partial(tf.reduce_mean, axis=0), zip(*gradients_list))
+            loss_list.append(loss)
+            gradients_list.append(gradients)
 
-    train_op = optimizer.apply_gradients(
-        grads_and_vars=zip(gradients, variables),
-        global_step=global_step
-    )
+        loss = tf.reduce_mean(loss_list, axis=0)
+        gradients = map(functools.partial(tf.reduce_mean, axis=0), zip(*gradients_list))
 
-    with tf.train.SingularMonitoredSession(
-        scaffold=tf.train.Scaffold(
-            init_op=tf.global_variables_initializer(),
-            local_init_op=tf.group(
-                tf.local_variables_initializer(),
-                tf.tables_initializer()
-            )
-        ),
-        checkpoint_dir=args.model_dir,
-        hooks=[
-            tf.train.CheckpointSaverHook(
-                checkpoint_dir=args.model_dir,
-                save_steps=1000,
-                saver=tf.train.Saver(
-                    max_to_keep=10,
-                    keep_checkpoint_every_n_hours=12,
+        train_op = optimizer.apply_gradients(
+            grads_and_vars=zip(gradients, variables),
+            global_step=global_step
+        )
+
+        with tf.train.SingularMonitoredSession(
+            scaffold=tf.train.Scaffold(
+                init_op=tf.global_variables_initializer(),
+                local_init_op=tf.group(
+                    tf.local_variables_initializer(),
+                    tf.tables_initializer()
                 )
             ),
-            tf.train.SummarySaverHook(
-                output_dir=args.model_dir,
-                save_steps=100,
-                summary_op=tf.summary.merge([
-                    tf.summary.scalar("loss", loss)
-                ])
-            ),
-            tf.train.LoggingTensorHook(
-                tensors=dict(
-                    global_step=global_step,
-                    loss=loss
+            checkpoint_dir=args.model_dir,
+            hooks=[
+                tf.train.CheckpointSaverHook(
+                    checkpoint_dir=args.model_dir,
+                    save_steps=1000,
+                    saver=tf.train.Saver(
+                        max_to_keep=10,
+                        keep_checkpoint_every_n_hours=12,
+                    )
                 ),
-                every_n_iter=100,
-            )
-        ]
-    ) as session:
+                tf.train.SummarySaverHook(
+                    output_dir=args.model_dir,
+                    save_steps=100,
+                    summary_op=tf.summary.merge([
+                        tf.summary.scalar("loss", loss)
+                    ])
+                ),
+                tf.train.LoggingTensorHook(
+                    tensors=dict(
+                        global_step=global_step,
+                        loss=loss
+                    ),
+                    every_n_iter=100,
+                )
+            ]
+        ) as session:
 
-        while not session.should_stop():
-            session.run(train_op)
+            while not session.should_stop():
+                session.run(train_op)
