@@ -45,10 +45,11 @@ if __name__ == "__main__":
         ),
         params=dict(
             weight_decay=2e-4,
-            learning_rate=lambda global_step: tf.train.piecewise_constant(
-                x=global_step,
-                boundaries=[50000 * num_epochs // args.batch_size for num_epochs in [100, 150, 200]],
-                values=[0.1 * decay_rate for decay_rate in [1.0, 0.1, 0.01, 0.001]]
+            learning_rate=lambda global_step: tf.train.exponential_decay(
+                learning_rate=0.1,
+                global_step=global_step,
+                decay_steps=2500000 / args.batch_size,
+                decay_rate=0.1
             ),
             momentum=0.9,
             use_nesterov=True
