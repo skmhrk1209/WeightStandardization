@@ -70,7 +70,7 @@ if __name__ == "__main__":
         )
 
         gradients = [
-            tf.reduce_mean(gradients, axis=0) for gradient in zip(*[
+            tf.reduce_mean(gradients, axis=0) for gradients in zip(*[
                 list(zip(*optimizer.compute_gradients(loss)))[0]
                 for loss in tf.unstack(losses, axis=0)
             ])
