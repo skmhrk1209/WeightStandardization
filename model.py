@@ -14,17 +14,14 @@ class Classifier(object):
             training=mode == tf.estimator.ModeKeys.TRAIN
         )
 
-        losses = tf.losses.sparse_softmax_cross_entropy(
+        loss = tf.losses.sparse_softmax_cross_entropy(
             labels=labels,
-            logits=logits,
-            reduction=tf.losses.Reduction.NONE
+            logits=logits
         )
-        losses += tf.add_n([
+        loss += tf.add_n([
             tf.nn.l2_loss(variable)
             for variable in tf.trainable_variables()
         ]) * params.weight_decay
-
-        loss = tf.reduce_mean(losses)
 
         if mode == tf.estimator.ModeKeys.TRAIN:
 
@@ -39,20 +36,8 @@ class Classifier(object):
 
             with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
 
-                def generator(losses, iterations):
-                    global variables
-                    for losses in tf.split(losses, iterations, axis=0):
-                        loss = tf.reduce_mean(losses)
-                        gradients, variables = zip(*optimizer.compute_gradients(loss))
-                        yield gradients
-
-                gradients = [
-                    tf.reduce_mean(gradients, axis=0)
-                    for gradients in zip(*generator(losses, params.iterations))
-                ]
-
-                train_op = optimizer.apply_gradients(
-                    grads_and_vars=list(zip(gradients, variables)),
+                train_op = optimizer.minimize(
+                    loss=loss,
                     global_step=tf.train.get_or_create_global_step()
                 )
 
