@@ -48,7 +48,7 @@ class Classifier(object):
 
                 gradients = [
                     tf.reduce_mean(gradients, axis=0)
-                    for gradients in zip(*generator())
+                    for gradients in zip(*generator(losses, params.iterations))
                 ]
 
                 train_op = optimizer.apply_gradients(
