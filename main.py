@@ -66,6 +66,7 @@ if __name__ == "__main__":
                 gradients, variables = zip(*optimizer.compute_gradients(loss))
                 yield gradients
 
+        loss = tf.reduce_mean(losses)
         gradients = map(functools.partial(tf.reduce_mean, axis=0), zip(*generator()))
 
         train_op = optimizer.apply_gradients(
