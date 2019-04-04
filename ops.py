@@ -5,8 +5,8 @@ import numpy as np
 def weight_standardization(weight, epsilon=1e-8):
     shape = weight.shape.as_list()
     weight = tf.reshape(weight, [-1, shape[-1]])
-    weight -= tf.reduce_mean(weight, axis=0, keepdims=True)
-    weight /= tf.reduce_std(tf.square(weight), axis=0, keepdims=True)
+    weight -= tf.math.reduce_mean(weight, axis=0, keepdims=True)
+    weight /= tf.math.reduce_std(tf.square(weight), axis=0, keepdims=True)
     weight = tf.reshape(weight, shape)
     return weight
 
