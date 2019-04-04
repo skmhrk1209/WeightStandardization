@@ -24,7 +24,7 @@ tf.logging.set_verbosity(tf.logging.INFO)
 
 if __name__ == "__main__":
 
-    resnet = ResNetWithWeightStandardization(
+    classifier = ResNetWithWeightStandardization(
         conv_param=Param(filters=32, kernel_size=[3, 3], strides=[1, 1]),
         pool_param=None,
         residual_params=[
@@ -44,8 +44,11 @@ if __name__ == "__main__":
 
     if args.train:
 
-        global_step = tf.train.create_global_step()
+        logits = classifier(images)
+        losses = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits, reduction=None)
+        losses += tf.add_n([tf.nn.l2_loss(variable) for variable in tf.trainable_variables()]) * 2e-4
 
+        global_step = tf.train.create_global_step()
         optimizer = tf.train.MomentumOptimizer(
             learning_rate=tf.train.piecewise_constant(
                 x=global_step,
@@ -56,26 +59,14 @@ if __name__ == "__main__":
             use_nesterov=True
         )
 
-        images_list = tf.split(images, num_or_size_splits=args.batch_size, axis=0)
-        labels_list = tf.split(labels, num_or_size_splits=args.batch_size, axis=0)
+        def generator():
+            global variables
+            for losses in tf.split(losses, num_or_size_splits=args.batch_size, axis=0):
+                loss = tf.reduce_mean(losses)
+                gradients, variables = zip(*optimizer.compute_gradients(loss))
+                yield gradients
 
-        loss_list = []
-        gradients_list = []
-
-        for images, labels in zip(images_list, labels_list):
-
-            logits = resnet(images, reuse=tf.AUTO_REUSE)
-
-            loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
-            loss += tf.add_n([tf.nn.l2_loss(variable) for variable in tf.trainable_variables()]) * 2e-4
-
-            gradients, variables = zip(*optimizer.compute_gradients(loss))
-
-            loss_list.append(loss)
-            gradients_list.append(gradients)
-
-        loss = tf.reduce_mean(loss_list, axis=0)
-        gradients = map(functools.partial(tf.reduce_mean, axis=0), zip(*gradients_list))
+        gradients = map(functools.partial(tf.reduce_mean, axis=0), zip(*generator()))
 
         train_op = optimizer.apply_gradients(
             grads_and_vars=zip(gradients, variables),
