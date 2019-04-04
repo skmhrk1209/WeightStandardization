@@ -62,16 +62,10 @@ if __name__ == "__main__":
 
     for images, labels in zip(images_list, labels_list):
 
-        logits = resnet(images, reuse=bool(i))
+        logits = resnet(images, reuse=tf.AUTO_REUSE)
 
-        loss = tf.losses.sparse_softmax_cross_entropy(
-            labels=labels,
-            logits=logits
-        )
-        loss += tf.add_n([
-            tf.nn.l2_loss(variable)
-            for variable in tf.trainable_variables()
-        ]) * 2e-4
+        loss = tf.losses.sparse_softmax_cross_entropy(labels=labels, logits=logits)
+        loss += tf.add_n([tf.nn.l2_loss(variable) for variable in tf.trainable_variables()]) * 2e-4
 
         gradients, variables = zip(*optimizer.compute_gradients(loss))
 
