@@ -45,12 +45,17 @@ if __name__ == "__main__":
     if args.train:
 
         logits = classifier(images)
+
         losses = tf.losses.sparse_softmax_cross_entropy(
             labels=labels,
             logits=logits,
             reduction=tf.losses.Reduction.NONE
         )
-        losses += tf.add_n([tf.nn.l2_loss(variable) for variable in tf.trainable_variables()]) * 2e-4
+        losses += tf.add_n([
+            tf.nn.l2_loss(variable)
+            for variable in tf.trainable_variables()
+        ]) * 2e-4
+
         loss = tf.reduce_mean(losses)
 
         global_step = tf.train.create_global_step()
