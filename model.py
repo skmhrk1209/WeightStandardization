@@ -53,7 +53,7 @@ class Classifier(object):
 
                 train_op = optimizer.apply_gradients(
                     grads_and_vars=zip(gradients, variables),
-                    global_step=tf.train.create_global_step()
+                    global_step=tf.train.get_or_create_global_step()
                 )
 
             return tf.estimator.EstimatorSpec(
