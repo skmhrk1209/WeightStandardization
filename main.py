@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
         def generator():
             global variables
-            for loss in tf.unstack(losses):
+            for loss in tf.unstack(losses, axis=0):
                 gradients, variables = zip(*optimizer.compute_gradients(loss))
                 yield gradients
 
