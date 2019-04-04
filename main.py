@@ -15,7 +15,6 @@ parser.add_argument("--model_dir", type=str, default="cifar10_resnet_model")
 parser.add_argument('--filenames', type=str, default="cifar-10-batches-py/data_batch*")
 parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--num_epochs", type=int, default=200)
-parser.add_argument("--total_steps", type=int, default=None)
 parser.add_argument('--train', action="store_true")
 parser.add_argument('--eval', action="store_true")
 args = parser.parse_args()
@@ -116,9 +115,6 @@ if __name__ == "__main__":
                     loss=loss
                 ),
                 every_n_iter=100,
-            ),
-            tf.train.StopAtStepHook(
-                last_step=args.total_steps
             )
         ]
     ) as session:
