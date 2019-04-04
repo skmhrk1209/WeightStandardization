@@ -56,8 +56,6 @@ if __name__ == "__main__":
             for variable in tf.trainable_variables()
         ]) * 2e-4
 
-        loss = tf.reduce_mean(losses)
-
         global_step = tf.train.create_global_step()
         optimizer = tf.train.MomentumOptimizer(
             learning_rate=tf.train.piecewise_constant(
@@ -70,7 +68,8 @@ if __name__ == "__main__":
         )
 
         gradients = [
-            tf.reduce_mean(gradients, axis=0) for gradients in zip(*[
+            tf.reduce_mean(gradients, axis=0)
+            for gradients in zip(*[
                 list(zip(*optimizer.compute_gradients(loss)))[0]
                 for loss in tf.unstack(losses, axis=0)
             ])
@@ -80,6 +79,8 @@ if __name__ == "__main__":
             grads_and_vars=zip(gradients, tf.trainable_variables()),
             global_step=global_step
         )
+
+        loss = tf.reduce_mean(losses)
 
         with tf.train.SingularMonitoredSession(
             scaffold=tf.train.Scaffold(
