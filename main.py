@@ -9,7 +9,7 @@ import hooks
 from param import Param
 from model import Classifier
 from dataset import cifar10_input_fn
-from network import ResNetWithWeightStandardization
+from network import ResNetWithBatchNormalization as ResNet
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_dir", type=str, default="cifar10_resnet_model")
@@ -28,7 +28,7 @@ if __name__ == "__main__":
 
     estimator = tf.estimator.Estimator(
         model_fn=lambda features, labels, mode, params: Classifier(
-            network=ResNetWithWeightStandardization(
+            network=ResNet(
                 conv_param=Param(filters=32, kernel_size=[3, 3], strides=[1, 1]),
                 pool_param=None,
                 residual_params=[
@@ -47,7 +47,7 @@ if __name__ == "__main__":
         params=dict(
             weight_decay=2e-4,
             learning_rate=lambda global_step: tf.train.exponential_decay(
-                learning_rate=1e-1,
+                learning_rate=0.1,
                 global_step=global_step,
                 decay_steps=2500000 / args.batch_size,
                 decay_rate=0.1
