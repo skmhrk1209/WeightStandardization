@@ -66,5 +66,18 @@ if __name__ == "__main__":
                 batch_size=args.batch_size,
                 num_epochs=args.num_epochs,
                 shuffle=True
+            ),
+            max_steps=args.max_steps
+        )
+
+    if args.eval:
+
+        estimator.evaluate(
+            input_fn=functools.partial(
+                cifar10_input_fn,
+                filenames=glob.glob(args.filenames),
+                batch_size=args.batch_size,
+                num_epochs=1,
+                shuffle=False
             )
         )

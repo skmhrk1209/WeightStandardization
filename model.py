@@ -46,3 +46,20 @@ class Classifier(object):
                 loss=loss,
                 train_op=train_op
             )
+
+        if mode == tf.estimator.ModeKeys.EVAL:
+
+            predictions = tf.argmax(
+                input=logits,
+                axis=-1
+            )
+            accuracy = tf.metrics.accuracy(
+                labels=labels,
+                predictions=predictions
+            )
+
+            return tf.estimator.EstimatorSpec(
+                mode=mode,
+                loss=loss,
+                eval_metric_ops=dict(accuracy=accuracy)
+            )
