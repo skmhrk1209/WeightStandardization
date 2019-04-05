@@ -18,7 +18,7 @@ parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--num_epochs", type=int, default=200)
 parser.add_argument("--max_steps", type=int, default=100000)
 parser.add_argument('--train', action="store_true")
-parser.add_argument('--eval', action="store_true")
+parser.add_argument('--evaluate', action="store_true")
 args = parser.parse_args()
 
 tf.logging.set_verbosity(tf.logging.INFO)
