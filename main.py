@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     if args.eval:
 
-        estimator.evaluate(
+        tf.logging.info(estimator.evaluate(
             input_fn=functools.partial(
                 cifar10_input_fn,
                 filenames=glob.glob(args.filenames),
@@ -80,4 +80,4 @@ if __name__ == "__main__":
                 num_epochs=1,
                 shuffle=False
             )
-        )
+        ))
