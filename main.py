@@ -70,7 +70,7 @@ if __name__ == "__main__":
             max_steps=args.max_steps
         )
 
-    if args.eval:
+    if args.evaluate:
 
         tf.logging.info(estimator.evaluate(
             input_fn=functools.partial(
