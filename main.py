@@ -9,7 +9,7 @@ import hooks
 from param import Param
 from model import Classifier
 from dataset import cifar10_input_fn
-from network import ResNetWithWeightStandardization as ResNet
+from network import ResNetWithBatchNormalization as ResNet
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_dir", type=str, default="cifar10_resnet_model")
