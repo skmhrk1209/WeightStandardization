@@ -16,7 +16,6 @@ parser.add_argument("--model_dir", type=str, default="cifar10_resnet_model")
 parser.add_argument('--filenames', type=str, default="cifar-10-batches-py/data_batch*")
 parser.add_argument("--batch_size", type=int, default=32)
 parser.add_argument("--num_epochs", type=int, default=200)
-parser.add_argument("--max_steps", type=int, default=100000)
 parser.add_argument('--train', action="store_true")
 parser.add_argument('--evaluate', action="store_true")
 args = parser.parse_args()
@@ -47,9 +46,9 @@ if __name__ == "__main__":
         params=dict(
             weight_decay=2e-4,
             learning_rate=lambda global_step: tf.train.exponential_decay(
-                learning_rate=0.1,
+                learning_rate=0.1 * args.batch_size / 32,
                 global_step=global_step,
-                decay_steps=2500000 / args.batch_size,
+                decay_steps=50000 * args.num_epochs / args.batch_size / 4,
                 decay_rate=0.1
             ),
             momentum=0.9,
@@ -66,8 +65,7 @@ if __name__ == "__main__":
                 batch_size=args.batch_size,
                 num_epochs=args.num_epochs,
                 shuffle=True
-            ),
-            max_steps=args.max_steps
+            )
         )
 
     if args.evaluate:
