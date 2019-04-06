@@ -46,7 +46,7 @@ if __name__ == "__main__":
         params=dict(
             weight_decay=2e-4,
             learning_rate=lambda global_step: tf.train.exponential_decay(
-                learning_rate=0.1 * args.batch_size / 32,
+                learning_rate=0.1 * args.batch_size / 64,
                 global_step=global_step,
                 decay_steps=50000 * args.num_epochs / args.batch_size / 4,
                 decay_rate=0.1
