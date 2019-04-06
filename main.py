@@ -14,7 +14,7 @@ from network import ResNetWithWeightStandardization as ResNet
 parser = argparse.ArgumentParser()
 parser.add_argument("--model_dir", type=str, default="cifar10_resnet_model")
 parser.add_argument('--filenames', type=str, default="cifar-10-batches-py/data_batch*")
-parser.add_argument("--batch_size", type=int, default=32)
+parser.add_argument("--batch_size", type=int, default=64)
 parser.add_argument("--num_epochs", type=int, default=200)
 parser.add_argument('--train', action="store_true")
 parser.add_argument('--evaluate', action="store_true")
